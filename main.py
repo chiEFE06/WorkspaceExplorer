@@ -1,6 +1,8 @@
 import os
+from data import FileTag
+from data import FolderTag
 
-def listdir_sort(path):
+"""def listdir_sort(path):
     file_dict = {"path":path,"folders":list(),"files":list()}
     print(file_dict)
     for file in os.listdir(path):
@@ -25,7 +27,14 @@ def directory_view(file_dict, indent=1):
     for folder in file_dict["folders"]:
         output += directory_view(folder, indent + 1)
 
-    return output
+    return output"""
+"""def listdir_tagged(path):
+    WorkFolder = FolderTag(path)
+    for file in os.listdir(path):
+        if os.path.isdir(os.path.join(path, file)):
+            pass
+        else:
+            WorkFolder.insert_file(FileTag(os.path.join(path, file)))"""
 
 work_dir = str()
 
@@ -36,5 +45,5 @@ os.chdir(work_dir)
 
 
 print(os.listdir(work_dir))
-print(listdir_sort(work_dir))
-print(directory_view(listdir_sort(work_dir)))
+WorkFolder = FolderTag(work_dir)
+print(WorkFolder.print_files())
