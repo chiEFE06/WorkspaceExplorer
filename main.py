@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pickle
 from data import FileTag
 from data import FolderTag
+import sys
 
 data_file = "user_data.xml"
 tag_file = "tag_data.pkl"
@@ -66,10 +67,27 @@ def get_or_create_folder_tag():
     dump_folder_tag(root_folder, tag_file)
     return root_folder
 
+def create_directory(folder_path,work_dir):
+    folder_path=os.path.join(work_dir,folder_path)
+    try:
+        os.mkdir(folder_path)
+    except OSError as e:
+        print("Failed to create directory", e)
+
+def remove_file(file_path,work_dir,use_folder=False):
+    file_path = os.path.join(work_dir, file_path)
+    if use_folder:
+        os.rmdir(file_path)
+    else:
+        os.remove(file_path)
+
+
 
 work_folder = get_or_create_work_dir()
 root_folder = get_or_create_folder_tag()
 
 print(root_folder.print_files())
+
+root_folder.search_for_file("YAY.txt")
 
 

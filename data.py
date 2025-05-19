@@ -40,3 +40,18 @@ class FolderTag:
         for folder in self.folders:
             output += folder.print_files(indent + 1)
         return output
+
+    def search_for_file(self, file_name):
+
+        for file in self.files:
+            if file.file_name == file_name:
+                print(f"Found {file.file_name}")
+                return file
+
+        for folder in self.folders:
+            folder.search_for_file(file_name)
+
+    def file_by_path(self, relative_path):
+        folder_ord = relative_path.split("/")
+        if len(folder_ord) == 1:
+            return self.search_for_file(folder_ord[0])
