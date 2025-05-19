@@ -1,49 +1,72 @@
 import os
+import xml.etree.ElementTree as ET
+import pickle
 from data import FileTag
 from data import FolderTag
 
-"""def listdir_sort(path):
-    file_dict = {"path":path,"folders":list(),"files":list()}
-    print(file_dict)
-    for file in os.listdir(path):
-        if len(file.split(".")) == 1:
-            file_dict["folders"].append(listdir_sort(path+"/"+file))
+data_file = "user_data.xml"
+tag_file = "tag_data.pkl"
+
+def get_work_dir_from_xml():
+    """Reads the work directory from user_data.xml."""
+    tree = ET.parse(data_file)
+    root = tree.getroot()
+    work_dir = root.find("work_dir").text
+    return work_dir
+
+def create_user_data_xml(work_dir):
+    """Creates the XML file with the work directory."""
+    root = ET.Element("user_data")
+    ET.SubElement(root, "work_dir").text = work_dir
+    tree = ET.ElementTree(root)
+    tree.write(data_file)
+
+def get_or_create_work_dir():
+    """Main function to either get from XML or prompt and save."""
+    if os.path.exists(data_file):
+        try:
+            work_dir = get_work_dir_from_xml()
+            if os.path.isdir(work_dir):
+                return work_dir
+            else:
+                print("Saved directory is invalid. Please enter a new one.")
+        except Exception as e:
+            print("Failed to read user_data.xml:", e)
+
+    # If XML doesn't exist or is invalid, prompt user
+    while True:
+        work_dir = input("Enter work directory: ").strip()
+        if os.path.isdir(work_dir):
+            create_user_data_xml(work_dir)
+            return work_dir
         else:
-            file_dict["files"].append(file)
-    return file_dict
+            print("Invalid directory. Try again.")
+
+def dump_folder_tag(folder_obj,save_file):
+    with open(save_file, "wb") as f:
+        pickle.dump(folder_obj, f)
+
+def read_pickle(save_file):
+    with open(save_file, "rb") as f:
+        loaded_obj = pickle.load(f)
+        return loaded_obj
+
+def get_or_create_folder_tag():
+    if os.path.exists(tag_file):
+        try:
+            root_folder = read_pickle(tag_file)
+            return root_folder
+        except Exception as e:
+            print("Failed to read tag data", e)
+
+    root_folder = FolderTag(work_folder)
+    dump_folder_tag(root_folder, tag_file)
+    return root_folder
 
 
+work_folder = get_or_create_work_dir()
+root_folder = get_or_create_folder_tag()
+
+print(root_folder.print_files())
 
 
-def directory_view(file_dict, indent=1):
-    output = ""
-    indent_str = "----" * indent
-    folder_name = os.path.basename(file_dict["path"])
-    output += f"{indent_str}{folder_name}\n"
-
-    for file in file_dict["files"]:
-        output += f"{indent_str}----{file}\n"
-
-    for folder in file_dict["folders"]:
-        output += directory_view(folder, indent + 1)
-
-    return output"""
-"""def listdir_tagged(path):
-    WorkFolder = FolderTag(path)
-    for file in os.listdir(path):
-        if os.path.isdir(os.path.join(path, file)):
-            pass
-        else:
-            WorkFolder.insert_file(FileTag(os.path.join(path, file)))"""
-
-work_dir = str()
-
-while work_dir == "":
-    work_dir = input("Please input a work directory")
-
-os.chdir(work_dir)
-
-
-print(os.listdir(work_dir))
-WorkFolder = FolderTag(work_dir)
-print(WorkFolder.print_files())
