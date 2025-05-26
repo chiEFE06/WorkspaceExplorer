@@ -2,16 +2,57 @@ import os
 
 
 class FileTag:
-    def __init__(self,file_path,maintag="",subtags=[]):
-        self.maintag = maintag
+    def __init__(self, file_path, maintag="", subtags=None):
+        if subtags is None:
+            subtags = []
+        self.maintag = maintag.lower()
         self.subtags = subtags
-        self.file_path = file_path
-        self.file_name = os.path.basename(file_path)
+        self.file_path = os.path.normcase(file_path).lower()
+        self.file_name = os.path.basename(file_path).lower()
+
+    def get_maintag(self):
+        return self.maintag
+    def get_subtags(self):
+        return self.subtags
+    def get_file_path(self):
+        return self.file_path
+    def get_file_name(self):
+        return self.file_name
+
+    def add_maintag(self,maintag):
+        self.maintag = maintag.lower()
+
+    def add_subtag(self,subtag,old_subtag=""):
+        subtag = subtag.lower()
+        if old_subtag != "":
+            try:
+                self.subtags.remove(old_subtag)
+            except ValueError:
+                print("Given subtag does not exist")
+        if subtag not in self.subtags:
+            self.subtags.append(subtag)
+        else:
+            print("Given subtag already exists")
+
+    def remove_maintag(self):
+        self.maintag = "ignore"
+
+    def remove_subtag(self,old_subtag=""):
+        if old_subtag != "":
+            try:
+                self.subtags.remove(old_subtag)
+            except ValueError:
+                print("Given subtag does not exist")
+        else:
+            self.subtags = []
+
 
     def __str__(self):
-        return f"FileTag({self.file_name}, main='{self.maintag}', subtags={self.subtags})"
+        return f"{self.file_name}, maintag='{self.maintag}', subtags={self.subtags}"
+    def __repr__(self):
+        return str(self) + " " + f"path: {self.file_path}"
 
-class FolderTag:
+"""class FolderTag:
     def __init__(self, folder_path):
         self.folder_name = os.path.basename(folder_path)
         self.folder_path = folder_path
@@ -54,4 +95,4 @@ class FolderTag:
     def file_by_path(self, relative_path):
         folder_ord = relative_path.split("/")
         if len(folder_ord) == 1:
-            return self.search_for_file(folder_ord[0])
+            return self.search_for_file(folder_ord[0])"""
