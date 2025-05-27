@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a23fc629-7c08-4e2f-8b74-6ff323a5e143" name="Changes" comment="Initial finish">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="a23fc629-7c08-4e2f-8b74-6ff323a5e143" name="Changes" comment="Completed README.md" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,7 +88,7 @@
       <workItem from="1747838259947" duration="361000" />
       <workItem from="1748236752965" duration="22913000" />
       <workItem from="1748283810381" duration="1292000" />
-      <workItem from="1748325180834" duration="11338000" />
+      <workItem from="1748325180834" duration="11919000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
@@ -175,7 +170,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748335466930</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Completed README.md">
+      <option name="closed" value="true" />
+      <created>1748338039844</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1748338039844</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -188,7 +191,8 @@
     <MESSAGE value="Updated comments" />
     <MESSAGE value="Removed FolderTag and wrote most of the functions." />
     <MESSAGE value="Initial finish" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial finish" />
+    <MESSAGE value="Completed README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed README.md" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/WorkplaceExplorer$main.coverage" NAME="main Coverage Results" MODIFIED="1748257751013" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

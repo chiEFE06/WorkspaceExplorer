@@ -5,7 +5,8 @@ Each file is given a single main tag, and can be tagged with multiple sub-tags.
 
 ## Usage
 On initial launch, the program will ask for work folder to tag in. After discovering all files in subdirectories it will ask for a main tag for each file. This step is skip able, however the program will ask to fill in the missing tag on each launch. To prevent that, the user can input ignore as the main tag.
-The program only accepts paths relative to the work directory first chosen. All the M/S arguments below symbolise the tag type, maintag and subtag respectively.
+The program only accepts paths relative to the work directory first chosen. 
+All the M/S arguments below symbolise the tag type, maintag and subtag respectively.
 
 | Command   | Description                                                    | Usage                                          | Arguments                                                                                                                                                                                               |
 |-----------|----------------------------------------------------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
