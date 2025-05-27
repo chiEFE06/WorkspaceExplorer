@@ -17,3 +17,7 @@ All the M/S arguments below symbolise the tag type, maintag and subtag respectiv
 | mkdir     | Creates a folder                                               | mkdir relative_path                            | None                                                                                                                                                                                                    |
 | remove    | Removes file(s) along with their tag data                      | remove (-R) relative_path                      | -R: runs the command for all the files in the given folder, instead for only a single file.                                                                                                             |
 | help      | Built-in python module to display commands and their arguments | -h or 'command' -h                             | None                                                                                                                                                                                                    |
+
+
+
+Project was written on Python 3.13
