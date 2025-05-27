@@ -116,7 +116,7 @@ def remove_file(file_path,use_folder=False,work_dir=None):
         os.rmdir(file_path)
         print(f"Removed {file_path}")
     elif os.path.isdir(file_path):
-        print("Selection is folder, please use -R modifier")
+        print("Selection is a folder, please use -R modifier")
     else:
         try:
             file_dict.pop(str(file_path))
