@@ -2,11 +2,9 @@ import os
 
 
 class FileTag:
-    def __init__(self, file_path, maintag="", subtags=None):
-        if subtags is None:
-            subtags = []
+    def __init__(self, file_path, maintag=""):
         self.maintag = maintag.lower()
-        self.subtags = subtags
+        self.subtags = tuple()
         self.file_path = os.path.normcase(file_path).lower()
         self.file_name = os.path.basename(file_path).lower()
 
@@ -19,32 +17,40 @@ class FileTag:
     def get_file_name(self):
         return self.file_name
 
-    def add_maintag(self,maintag):
-        self.maintag = maintag.lower()
+    def add_maintag(self,maintag,old_maintag=""):
+        if (old_maintag != "" and old_maintag == self.maintag) or (old_maintag == ""):
+            self.maintag = maintag
 
     def add_subtag(self,subtag,old_subtag=""):
         subtag = subtag.lower()
+        output_list = list(self.subtags)
         if old_subtag != "":
             try:
-                self.subtags.remove(old_subtag)
+                output_list.remove(old_subtag)
             except ValueError:
-                print("Given subtag does not exist")
-        if subtag not in self.subtags:
-            self.subtags.append(subtag)
+                print("Subtag to replace does not exist")
+        if subtag not in output_list:
+            output_list.append(subtag)
         else:
             print("Given subtag already exists")
 
-    def remove_maintag(self):
-        self.maintag = "ignore"
+        self.subtags = tuple(output_list)
+
+    def remove_maintag(self,old_maintag=""):
+        if (old_maintag != "" and old_maintag == self.maintag) or (old_maintag == ""):
+            self.maintag = "ignore"
+
 
     def remove_subtag(self,old_subtag=""):
+        output_list = list(self.subtags)
         if old_subtag != "":
             try:
-                self.subtags.remove(old_subtag)
+                output_list.remove(old_subtag)
             except ValueError:
-                print("Given subtag does not exist")
+                print("Subtag to remove does not exist")
         else:
-            self.subtags = []
+            output_list = []
+        self.subtags = tuple(output_list)
 
 
     def __str__(self):

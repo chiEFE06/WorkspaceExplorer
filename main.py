@@ -47,13 +47,22 @@ def save_tag_data(file_list,save_file):
     output_dict = dict()
     for entry in file_list:
         output_dict[entry.get_file_path()] = entry
-
-    with open(save_file, "wb") as f:
+    try:
+        f = open(save_file, "wb")
         pickle.dump(output_dict, f)
+    except Exception as e:
+        print("Failed to save tag data ", e)
+    else:
+        print("Saved tag data successfully")
 
 def save_tag_data_from_dict(file_dict, save_file):
-    with open(save_file, "wb") as f:
+    try:
+        f = open(save_file, "wb")
         pickle.dump(file_dict, f)
+    except Exception as e:
+        print("Failed to save tag data ", e)
+    else:
+        print("Saved tag data successfully")
 
 def read_pickle(save_file):
     # Reads the tag data from tag_data.pkl.
@@ -84,14 +93,6 @@ def get_or_create_tag_data():
 
     return output_dict
 
-
-
-def create_directory(folder_path,work_dir):
-    folder_path=os.path.join(work_dir,folder_path)
-    try:
-        os.mkdir(folder_path)
-    except OSError as e:
-        print("Failed to create directory", e)
 
 def remove_file(file_path,use_folder=False,work_dir=None):
     file_path=os.path.join(work_dir,file_path) if work_dir else file_path
@@ -128,8 +129,6 @@ def remove_file(file_path,use_folder=False,work_dir=None):
             print("Removed file", file_path)
         pass
 
-    save_tag_data_from_dict(file_dict,tag_file)
-
 def search_for_files(work_dir):
     # Search for all files in the work dir and in its sub folders and adds them as FileTag to a list
     output = list()
@@ -154,7 +153,7 @@ def update_files(work_dir):
     for entry in file_list:
         if entry.get_maintag() == "":
             entry.add_maintag(input(f"Enter a main tag for {entry.file_name}: "))
-    save_tag_data_from_dict(file_dict,tag_file)
+
     return
 
 def recursive_addtag(work_dir,tag_list,path_input,tag_type,tag):
@@ -176,7 +175,7 @@ def recursive_removetag(work_dir,tag_list,path_input,tag_type,existing_tag=""):
     for file in tag_list:
         if file.get_file_path().startswith(path):
             if tag_type == "M":
-                file.remove_maintag()
+                file.remove_maintag(existing_tag)
             elif tag_type == "S":
                 file.remove_subtag(existing_tag)
     save_tag_data_from_dict(file_dict,tag_file)
@@ -188,7 +187,7 @@ def recursive_edittag(work_dir,tag_list,path_input,tag_type,tag,existing_tag="")
     for file in tag_list:
         if file.get_file_path().startswith(path):
             if tag_type == "M" and file.get_maintag() == existing_tag:
-                file.add_maintag(tag)
+                file.add_maintag(tag,existing_tag)
             elif tag_type == "S":
                 file.add_subtag(tag,existing_tag)
 
@@ -205,6 +204,25 @@ def print_files(folder_path,indent=0):
             output += f"{indent_str}____{entry.name}\n"
     return output
 
+def find_filetag_from_file(path):
+    try:
+        file = file_dict[path.lower()]
+    except KeyError:
+        print(f"File '{path}' not found in tag data.")
+        return
+    return file
+
+def search_for_tags(path,tag_list,tag_type,tag):
+    output = list()
+    path = path.lower()
+    for file in tag_list:
+        if file.get_file_path().startswith(path):
+            if tag_type == "M" and file.get_maintag() == tag:
+                output.append(f"Found {file.get_file_name()} in {file.get_file_path()}")
+            elif tag_type == "S" and tag in file.get_subtags():
+                output.append(f"Found {file.get_file_name()} in {file.get_file_path()}")
+    return "\n".join(output)
+
 def main():
     parser = argparse.ArgumentParser(prog="Workplace Explorer", description="Tag-based file explorer")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -215,9 +233,8 @@ def main():
         "-R", "--recursive", help="Recursively add tag(s) to all files inside a folder", action="store_true"
     )
     addtag_parser.add_argument("relative_path", help="Relative path to file or folder")
-    group = addtag_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-M", "--maintag", help="Add a maintag")
-    group.add_argument("-S", "--subtag", help="Add a subtag")
+    addtag_parser.add_argument("tag_type", choices=["M", "S"], help="Tag type: M for maintag, S for subtag")
+    addtag_parser.add_argument("tag_to_add", help="Tag to add")
 
     # removetag command
     removetag_parser = subparsers.add_parser("removetag", help="Removes tag(s) from file(s)")
@@ -225,9 +242,8 @@ def main():
         "-R", "--recursive", help="Recursively remove tag(s) from all files inside a folder", action="store_true"
     )
     removetag_parser.add_argument("relative_path", help="Relative path to file or folder")
-    group = removetag_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-M", "--maintag", help="Remove maintag", action="store_true")
-    group.add_argument("-S", "--subtag", nargs="?", const="", help="Remove subtag (optional: specify subtag to remove)")
+    removetag_parser.add_argument("tag_type", choices=["M", "S"], help="Tag type: M for maintag, S for subtag")
+    removetag_parser.add_argument("-t","--tag_to_remove", help="Tag to remove", default="")
 
     # edittag command
     edittag_parser = subparsers.add_parser("edittag", help="Edits tag(s) of file(s)")
@@ -235,66 +251,97 @@ def main():
         "-R", "--recursive", help="Recursively edit tag(s) of all files inside a folder", action="store_true"
     )
     edittag_parser.add_argument("relative_path", help="Relative path to file or folder")
-    group = edittag_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-M", "--maintag", help="Edits a maintag")
-    group.add_argument("-S", "--subtag", help="Edits a subtag")
+    edittag_parser.add_argument("tag_type", choices=["M", "S"], help="Tag type: M for maintag, S for subtag")
     edittag_parser.add_argument("new_tag", help="New tag")
+    edittag_parser.add_argument("old_tag", help="Tag to replace")
+
+    #search command
+    search_parser = subparsers.add_parser("search", help="Search tag(s) of file(s)")
+    search_parser.add_argument("-R","--search_folder", help="Specify the folder to search in")
+    search_parser.add_argument("tag_type", choices=["M", "S"], help="Tag type: M for maintag, S for subtag")
+    search_parser.add_argument("tag", help="Tag to search for")
+
+    #mkdir command
+    mkdir_parser = subparsers.add_parser("mkdir", help="Create a folder")
+    mkdir_parser.add_argument("relative_path", help="Relative path of the new folder")
+
+    #remove command
+    remove_parser = subparsers.add_parser("remove", help="Remove files/folders")
+    remove_parser.add_argument("-R","--recursive", help="Recursively remove files inside a folder", action="store_true")
+    remove_parser.add_argument("relative_path", help="Relative path")
 
     args = parser.parse_args()
 
     if args.command == "addtag":
-        tag_type = "M" if args.maintag else "S"
-        tag = args.maintag if args.maintag else args.subtag
+        tag_type = args.tag_type
+        tag = args.tag_to_add
         path = os.path.join(work_folder, args.relative_path)
         path = os.path.normpath(path)
         if args.recursive:
-            print("recursive")
             recursive_addtag(work_folder,file_list,args.relative_path,tag_type,tag)
         else:
-            try:
-                print("Looking up path:", path.lower())
-                print("Available paths:")
-                for p in file_dict:
-                    print(" -", p)
-                file = file_dict[path.lower()]
-            except KeyError:
-                print(f"File '{args.relative_path}' not found in tag data.")
-                return
+            file = find_filetag_from_file(path)
             if tag_type == "M":
                 file.add_maintag(tag)
             elif tag_type == "S":
                 file.add_subtag(tag)
 
-        print('Succesfully added ' + tag + ' to ' + path)
+        print('Successfully added ' + tag + ' to ' + path)
 
     elif args.command == "removetag":
-        tag_type = "M" if args.maintag else "S"
-        tag = args.subtag if args.subtag else None
+        tag_type = args.tag_type
+        tag = args.tag_to_remove
         path = os.path.join(work_folder, args.relative_path)
         path = os.path.normpath(path)
         if args.recursive:
             recursive_removetag(work_folder,file_list,args.relative_path,tag_type,tag)
         else:
-            file = file_dict[path.lower()]
+            file = find_filetag_from_file(path)
             if tag_type == "M":
-                file.remove_maintag()
+                file.remove_maintag(tag)
             elif tag_type == "S":
                 file.remove_subtag(tag)
 
     elif args.command == "edittag":
-        tag_type = "M" if args.maintag else "S"
-        existing_tag = args.maintag if args.maintag else args.subtag
+        tag_type = args.tag_type
+        existing_tag = args.old_tag
         new_tag = args.new_tag
         path = os.path.join(work_folder, args.relative_path)
         path = os.path.normpath(path)
         if args.recursive:
             recursive_edittag(work_folder,file_list,args.relative_path,tag_type,new_tag,existing_tag)
         else:
-            file = file_dict[path.lower()]
+            file = find_filetag_from_file(path)
             if tag_type == "M" and file.get_maintag() == existing_tag:
-                file.add_maintag(new_tag)
+                file.add_maintag(new_tag,existing_tag)
             elif tag_type == "S":
                 file.add_subtag(new_tag,existing_tag)
+
+    elif args.command == "search":
+        tag_type = args.tag_type
+        tag = args.tag
+        search_folder = os.path.join(work_folder,args.search_folder) if args.search_folder else work_folder
+        search_folder = os.path.normpath(search_folder)
+        print(search_for_tags(search_folder,file_list,tag_type, tag))
+
+    elif args.command == "mkdir":
+        path = os.path.join(work_folder, args.relative_path)
+        path = os.path.normpath(path)
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            print("Folder " + path + " already exists")
+        except OSError as e:
+            print("Failed to create directory", e)
+        except Exception as e:
+            print(e)
+        else:
+            print('Successfully created ' + path)
+
+    elif args.command == "remove":
+        path = os.path.join(work_folder, args.relative_path)
+        path = os.path.normpath(path)
+        remove_file(path,args.recursive)
 
 
 print("Getting or creating work folder")
@@ -308,10 +355,9 @@ print("Tag data creation successful")
 print("Checking and updating any changes")
 update_files(work_folder)
 print("Updating has completed")
-print(file_list)
+save_tag_data_from_dict(file_dict,tag_file)
 main()
 save_tag_data_from_dict(file_dict, tag_file)
-print(file_list)
 
 
 
