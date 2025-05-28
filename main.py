@@ -230,7 +230,7 @@ def recursive_edittag(work_dir,tag_list,path_input,tag_type,tag,existing_tag="")
     save_tag_data_from_dict(file_dict, tag_file)
 
 def print_files(folder_path,indent=0):
-    #debug command to list files with their hierarchy
+    # Lists files with their hierarchy
     output = str()
     indent_str = "____"*indent
     output += f"{indent_str}{os.path.basename(folder_path)}\n"
@@ -238,7 +238,8 @@ def print_files(folder_path,indent=0):
         if entry.is_dir():
             output += print_files(entry.path,indent + 1)
         elif entry.is_file():
-            output += f"{indent_str}____{entry.name}\n"
+            file = find_filetag_from_file(entry.path)
+            output += f"{indent_str}____{file.get_file_name()}: {file.get_maintag()}\n"
     return output
 
 def find_filetag_from_file(path):
@@ -321,6 +322,9 @@ def main():
     move_parser.add_argument("source_path", help="Relative path of the source file")
     move_parser.add_argument("dest_path", help="Relative path of the destination file")
 
+    #list command
+    list_parser = subparsers.add_parser("list", help="List all files")
+
     args = parser.parse_args()
 
     if args.command == "addtag":
@@ -399,6 +403,9 @@ def main():
 
     elif args.command == "move":
         move_file(args.source_path,args.dest_path,work_folder)
+
+    elif args.command == "list":
+        print(print_files(work_folder))
 
 
 print("Getting or creating work folder")

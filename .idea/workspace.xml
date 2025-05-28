@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a23fc629-7c08-4e2f-8b74-6ff323a5e143" name="Changes" comment="Added comments, copy and move functions.&#10;Tweaked README.md" />
+    <list default="true" id="a23fc629-7c08-4e2f-8b74-6ff323a5e143" name="Changes" comment="Tweaked README.md">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -90,7 +93,7 @@
       <workItem from="1748236752965" duration="22913000" />
       <workItem from="1748283810381" duration="1292000" />
       <workItem from="1748325180834" duration="13097000" />
-      <workItem from="1748386641232" duration="8244000" />
+      <workItem from="1748386641232" duration="8938000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
@@ -196,7 +199,23 @@
       <option name="project" value="LOCAL" />
       <updated>1748430429389</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Added comments, copy and move functions.&#10;Tweaked README.md">
+      <option name="closed" value="true" />
+      <created>1748430580202</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1748430580202</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Tweaked README.md">
+      <option name="closed" value="true" />
+      <created>1748430904454</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1748430904454</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,7 +241,8 @@
     <MESSAGE value="Initial finish" />
     <MESSAGE value="Completed README.md" />
     <MESSAGE value="Added comments, copy and move functions.&#10;Tweaked README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added comments, copy and move functions.&#10;Tweaked README.md" />
+    <MESSAGE value="Tweaked README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tweaked README.md" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/WorkplaceExplorer$main.coverage" NAME="main Coverage Results" MODIFIED="1748257751013" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
