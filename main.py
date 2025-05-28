@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pickle
 from data import FileTag
 import argparse
+import shutil
 
 data_file = "user_data.xml"
 tag_file = "tag_data.pkl"
@@ -32,7 +33,7 @@ def get_or_create_work_dir():
         except Exception as e:
             print("Failed to read user_data.xml:", e)
 
-    # If XML doesn't exist or is invalid, prompt user
+    # If XML doesn't exist or is invalid, ask the user
     while True:
         work_dir = input("Enter work directory: ").strip()
         work_dir = os.path.abspath(work_dir).lower()
@@ -43,10 +44,11 @@ def get_or_create_work_dir():
             print("Invalid directory. Try again.")
 
 def save_tag_data(file_list,save_file):
-    # Creates the pkl file with given FolderTag class object.
+    # Turns the given FileTag list to dictionary as file_path:FileTag then saves it to a .pkl file
     output_dict = dict()
     for entry in file_list:
         output_dict[entry.get_file_path()] = entry
+    # Saving as dictionary to provide direct access from path to FileTag
     try:
         f = open(save_file, "wb")
         pickle.dump(output_dict, f)
@@ -56,6 +58,7 @@ def save_tag_data(file_list,save_file):
         print("Saved tag data successfully")
 
 def save_tag_data_from_dict(file_dict, save_file):
+    # Saves the tag data directly from dictionary
     try:
         f = open(save_file, "wb")
         pickle.dump(file_dict, f)
@@ -79,7 +82,7 @@ def get_or_create_tag_data():
         except Exception as e:
             print("Failed to read tag data,deleting the file", e)
 
-
+    # If tag_data doesn't exist or is corrupt, discovers files inside the work folder and asks for a user input
     else:
         file_list = search_for_files(work_folder)
         for file in file_list:
@@ -95,12 +98,15 @@ def get_or_create_tag_data():
 
 
 def remove_file(file_path,use_folder=False,work_dir=None):
+    # First removes the file data from the memory then deletes the file
     file_path=os.path.join(work_dir,file_path) if work_dir else file_path
     file_path=os.path.normpath(file_path)
     file_path=file_path.lower()
+    # Works recursively if the given file_path is a folder
     if use_folder and os.path.isdir(file_path):
         for entry in os.scandir(file_path):
             if entry.is_file():
+                # If the inputted path is file, deletes it along with its tag data
                 try:
                     file_dict.pop(str(entry.path))
                     os.remove(entry.path)
@@ -115,9 +121,11 @@ def remove_file(file_path,use_folder=False,work_dir=None):
                 remove_file(entry.path,True)
         os.rmdir(file_path)
         print(f"Removed {file_path}")
+    # If the given path is a folder but use_folder is false, denies the action
     elif os.path.isdir(file_path):
         print("Selection is a folder, please use -R modifier")
     else:
+        # If the inputted path is file, deletes it along with its tag data
         try:
             file_dict.pop(str(file_path))
             os.remove(file_path)
@@ -139,7 +147,34 @@ def search_for_files(work_dir):
             output.append(FileTag(entry.path))
     return output
 
+def copy_file(file_path,target_path,copy_tags = bool(),work_dir = None):
+    # Copies a file with its tag data if copy_tags is true
+    file_path = os.path.join(work_dir, file_path) if work_dir else file_path
+    file_path = os.path.normpath(file_path).lower()
+    target_path = os.path.join(work_dir, target_path) if work_dir else target_path
+    target_path = os.path.normpath(target_path)
+    if os.path.isdir(file_path) or os.path.isdir(target_path):
+        print("Given paths should be to a file")
+        return
+    if find_filetag_from_file(file_path):
+        main_file = find_filetag_from_file(file_path)
+        shutil.copy(file_path, target_path)
+        new_maintag,new_subtags = main_file.get_tag_data()
+        file_dict[target_path.lower()] = FileTag(target_path,new_maintag,new_subtags) if copy_tags else FileTag(target_path)
+        if not copy_tags:
+            file = file_dict[target_path.lower()]
+            file.add_maintag(input(f"Enter a main tag for {file.file_name}: "))
+    print("Copied the file to: ",target_path)
+    return True
+
+def move_file(file_path,target_path,work_dir = None):
+    # Moves a file using copy_file and remove_file methods
+    if copy_file(file_path,target_path,True,work_dir):
+        remove_file(file_path,False,work_dir)
+
 def update_files(work_dir):
+    # Checks for new files inside the given directory
+    # Directly operates on global variables
     for entry in os.scandir(work_dir):
         entry_path = os.path.normcase(entry.path)
         if entry.is_file():
@@ -150,6 +185,7 @@ def update_files(work_dir):
 
         else:
             update_files(entry.path)
+    # Checks the memory for tagg-less files, asks for an input if any found
     for entry in file_list:
         if entry.get_maintag() == "":
             entry.add_maintag(input(f"Enter a main tag for {entry.file_name}: "))
@@ -194,6 +230,7 @@ def recursive_edittag(work_dir,tag_list,path_input,tag_type,tag,existing_tag="")
     save_tag_data_from_dict(file_dict, tag_file)
 
 def print_files(folder_path,indent=0):
+    #debug command to list files with their hierarchy
     output = str()
     indent_str = "____"*indent
     output += f"{indent_str}{os.path.basename(folder_path)}\n"
@@ -205,6 +242,7 @@ def print_files(folder_path,indent=0):
     return output
 
 def find_filetag_from_file(path):
+    # Finds the FileTag object from its path, returns an error if not found
     try:
         file = file_dict[path.lower()]
     except KeyError:
@@ -213,6 +251,7 @@ def find_filetag_from_file(path):
     return file
 
 def search_for_tags(path,tag_list,tag_type,tag):
+    # Linear search inside the memory for any given tag
     output = list()
     path = path.lower()
     for file in tag_list:
@@ -224,6 +263,7 @@ def search_for_tags(path,tag_list,tag_type,tag):
     return "\n".join(output)
 
 def main():
+    # main function for command arguments
     parser = argparse.ArgumentParser(prog="Workplace Explorer", description="Tag-based file explorer")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -269,6 +309,17 @@ def main():
     remove_parser = subparsers.add_parser("remove", help="Remove files/folders")
     remove_parser.add_argument("-R","--recursive", help="Recursively remove files inside a folder", action="store_true")
     remove_parser.add_argument("relative_path", help="Relative path")
+
+    #copy command
+    copy_parser = subparsers.add_parser("copy", help="Copy a file")
+    copy_parser.add_argument("source_path", help="Relative path of the source file")
+    copy_parser.add_argument("dest_path", help="Relative path of the destination file")
+    copy_parser.add_argument("-t","--copy_tags", help="Copy tags along the file",action="store_true")
+
+    #move command
+    move_parser = subparsers.add_parser("move", help="Move a file")
+    move_parser.add_argument("source_path", help="Relative path of the source file")
+    move_parser.add_argument("dest_path", help="Relative path of the destination file")
 
     args = parser.parse_args()
 
@@ -319,7 +370,7 @@ def main():
 
     elif args.command == "search":
         tag_type = args.tag_type
-        tag = args.tag
+        tag = args.tag.lower()
         search_folder = os.path.join(work_folder,args.search_folder) if args.search_folder else work_folder
         search_folder = os.path.normpath(search_folder)
         print(search_for_tags(search_folder,file_list,tag_type, tag))
@@ -343,6 +394,12 @@ def main():
         path = os.path.normpath(path)
         remove_file(path,args.recursive)
 
+    elif args.command == "copy":
+        copy_file(args.source_path,args.dest_path,args.copy_tags,work_folder)
+
+    elif args.command == "move":
+        move_file(args.source_path,args.dest_path,work_folder)
+
 
 print("Getting or creating work folder")
 work_folder = get_or_create_work_dir()
@@ -354,7 +411,7 @@ file_paths = list(file_dict.keys())
 print("Tag data creation successful")
 print("Checking and updating any changes")
 update_files(work_folder)
-print("Updating has completed")
+print("Checked for updates")
 save_tag_data_from_dict(file_dict,tag_file)
 main()
 save_tag_data_from_dict(file_dict, tag_file)

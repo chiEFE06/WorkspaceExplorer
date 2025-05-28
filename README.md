@@ -5,7 +5,7 @@ Each file is given a single main tag, and can be tagged with multiple sub-tags.
 
 ## Usage
 On initial launch, the program will ask for work folder to tag in. After discovering all files in subdirectories it will ask for a main tag for each file. This step is skip able, however the program will ask to fill in the missing tag on each launch. To prevent that, the user can input ignore as the main tag.
-The program only accepts paths relative to the work directory first chosen. 
+All paths must be relative to the initially chosen work directory. 
 All the M/S arguments below symbolise the tag type, maintag and subtag respectively.
 
 | Command   | Description                                                    | Usage                                          | Arguments                                                                                                                                                                                               |
@@ -16,8 +16,20 @@ All the M/S arguments below symbolise the tag type, maintag and subtag respectiv
 | edittag   | Changes a tag from a file with a new one                       | edittag (-R) relative_path M/S new_tag old_tag | -R: runs the command for all the files in the given folder, instead for only a single file.                                                                                                             |
 | mkdir     | Creates a folder                                               | mkdir relative_path                            | None                                                                                                                                                                                                    |
 | remove    | Removes file(s) along with their tag data                      | remove (-R) relative_path                      | -R: runs the command for all the files in the given folder, instead for only a single file.                                                                                                             |
-| help      | Built-in python module to display commands and their arguments | -h or 'command' -h                             | None                                                                                                                                                                                                    |
+| copy      | Copies a file                                                  | copy src_path dest_path (-t)                   | -t: copies the tag data along the file                                                                                                                                                                  |
+| move      | Moves a file by first copying then removing                    | move src_path dest_path                        | None                                                                                                                                                                                                    |
+| help      | Built-in python method to display commands and their arguments | -h or 'command' -h                             | None                                                                                                                                                                                                    |
 
 
+## Disclaimers
+The program is case-**insensitive** and doesn't strip special characters. Caution is advised.
+Space characters can be used inside quote marks:
+`python main.py addtag e_folder/modules.xlss M "DUE TOMORROW!"`
 
-Project was written on Python 3.13
+All paths inputted must be relative to the work folder and **must not start** with "/" or "\"
+should be:
+`python main.py addtag e_folder/example.txt M example`
+and not: 
+`python main.py addtag /e_folder/example.txt M example`
+
+The program was written in python version 3.13

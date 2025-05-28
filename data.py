@@ -2,12 +2,14 @@ import os
 
 
 class FileTag:
-    def __init__(self, file_path, maintag=""):
+    def __init__(self, file_path, maintag="", subtags=tuple()):
         self.maintag = maintag.lower()
-        self.subtags = tuple()
+        self.subtags = subtags
+        #For some reason, mutable objects like lists are stored globally for all FileTag type objects. Hence, all operations on subtags are made by type-casting to a list
         self.file_path = os.path.normcase(file_path).lower()
         self.file_name = os.path.basename(file_path).lower()
 
+    #get_attr functions, although they are not even private
     def get_maintag(self):
         return self.maintag
     def get_subtags(self):
@@ -16,13 +18,21 @@ class FileTag:
         return self.file_path
     def get_file_name(self):
         return self.file_name
+    def get_tag_data(self):
+        return self.maintag, self.subtags
 
     def add_maintag(self,maintag,old_maintag=""):
+        # Adds or replaces the main tag of the file
+        # If an old_maintag given, only replaces when tags match
+        maintag, old_maintag = maintag.lower(), old_maintag.lower()
         if (old_maintag != "" and old_maintag == self.maintag) or (old_maintag == ""):
             self.maintag = maintag
 
     def add_subtag(self,subtag,old_subtag=""):
+        # Adds a subtag if an old_subtag is not inputted
+        # Replaces the subtag if an old_subtag is inputted
         subtag = subtag.lower()
+        old_subtag = old_subtag.lower()
         output_list = list(self.subtags)
         if old_subtag != "":
             try:
@@ -37,11 +47,17 @@ class FileTag:
         self.subtags = tuple(output_list)
 
     def remove_maintag(self,old_maintag=""):
+        # Replaces the main tag of the file with "ignore"
+        # If an old_maintag given, only replaces when tags match
+        old_maintag = old_maintag.lower()
         if (old_maintag != "" and old_maintag == self.maintag) or (old_maintag == ""):
             self.maintag = "ignore"
 
 
     def remove_subtag(self,old_subtag=""):
+    # Clears the subtags tuple if an old_subtag is not given
+    # Removes the specific subtag from subtags tuple if an old_subtag is given
+        old_subtag = old_subtag.lower()
         output_list = list(self.subtags)
         if old_subtag != "":
             try:
@@ -52,12 +68,13 @@ class FileTag:
             output_list = []
         self.subtags = tuple(output_list)
 
-
+    # debug functions
     def __str__(self):
         return f"{self.file_name}, maintag='{self.maintag}', subtags={self.subtags}"
     def __repr__(self):
         return str(self) + " " + f"path: {self.file_path}"
 
+    #ditched the FolderTag idea because of nested classes
 """class FolderTag:
     def __init__(self, folder_path):
         self.folder_name = os.path.basename(folder_path)
