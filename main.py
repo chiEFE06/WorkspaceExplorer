@@ -229,17 +229,22 @@ def recursive_edittag(work_dir,tag_list,path_input,tag_type,tag,existing_tag="")
 
     save_tag_data_from_dict(file_dict, tag_file)
 
-def print_files(folder_path,indent=0):
+def print_files(folder_path,tag_type=str(),indent=0):
     # Lists files with their hierarchy
     output = str()
     indent_str = "____"*indent
     output += f"{indent_str}{os.path.basename(folder_path)}\n"
     for entry in os.scandir(folder_path):
         if entry.is_dir():
-            output += print_files(entry.path,indent + 1)
+            output += print_files(entry.path,tag_type,indent + 1)
         elif entry.is_file():
             file = find_filetag_from_file(entry.path)
-            output += f"{indent_str}____{file.get_file_name()}: {file.get_maintag()}\n"
+            if tag_type == "M":
+                output += f"{indent_str}____{file.get_file_name()}: {file.get_maintag()}\n"
+            elif tag_type == "S":
+                output += f"{indent_str}____{file.get_file_name()}: {file.get_subtags()}\n"
+            elif tag_type == "B":
+                output += f"{indent_str}____{file.get_file_name()}: {file.get_maintag()} | {file.get_subtags()}\n"
     return output
 
 def find_filetag_from_file(path):
@@ -324,6 +329,8 @@ def main():
 
     #list command
     list_parser = subparsers.add_parser("list", help="List all files")
+    list_parser.add_argument("tag_type", choices=["M", "S","B"], help="Tag type: M for maintag, S for subtag, B for both")
+
 
     args = parser.parse_args()
 
@@ -405,7 +412,7 @@ def main():
         move_file(args.source_path,args.dest_path,work_folder)
 
     elif args.command == "list":
-        print(print_files(work_folder))
+        print(print_files(work_folder,args.tag_type))
 
 
 print("Getting or creating work folder")
