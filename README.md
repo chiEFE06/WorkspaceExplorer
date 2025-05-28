@@ -24,12 +24,12 @@ All the M/S arguments below symbolise the tag type, maintag and subtag respectiv
 ## Disclaimers
 The program is case-**insensitive** and doesn't strip special characters. Caution is advised.
 Space characters can be used inside quote marks:
-`python main.py addtag e_folder/modules.xlss M "DUE TOMORROW!"`
+\n`python main.py addtag e_folder/modules.xlss M "DUE TOMORROW!"`
 
 All paths inputted must be relative to the work folder and **must not start** with "/" or "\"
 should be:
-`python main.py addtag e_folder/example.txt M example`
+\n`python main.py addtag e_folder/example.txt M example`
 and not: 
-`python main.py addtag /e_folder/example.txt M example`
+\n`python main.py addtag /e_folder/example.txt M example`
 
 The program was written in python version 3.13
